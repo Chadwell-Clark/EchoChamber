@@ -1,0 +1,50 @@
+import React, { useEffect, useState, useRef } from "react";
+import ReactDOM from "react-dom";
+
+const baseEndpoint = "https://api.github.com/users/";
+
+function App() {
+  const [username, setusername] = useState("chadwell-clark");
+  const [user, setUser] = useState(null);
+  const searchInput = useRef();
+
+  useEffect(() => {
+    getUser(username);
+  }, []);
+
+  function handleClearInput() {
+    searchInput.current.value = "";
+    searchInput.current.focus();
+  }
+
+  async function getUser() {
+    const response = await fetch(`${baseEndpoint}${username}`);
+    const data = await response.json();
+    setUser(data);
+  }
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="User Name"
+        onChange={(event) => setusername(event.target.value)}
+        ref={searchInput}
+      />
+      <button onClick={getUser}>Search</button>
+      <button onClick={handleClearInput}>Clear</button>
+      {user ? (
+        <div>
+          <h2>{user.name}</h2>
+          <p>{user.bio}</p>
+          <img alt="avatar" src={user.avatar_url} style={{ height: 50 }} />
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+}
+
+const rootNode = document.getElementById("root");
+ReactDOM.render(<App />, rootNode);
